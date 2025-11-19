@@ -7,13 +7,13 @@ const getIsMobile = () => {
 
 export const api = async (url: string, options: RequestInit = {}) => {
   const userAuth = Cookies.get('n_token')
-  const terasApiKey = process.env.NEXT_PUBLIC_BASE_API_KEY
+  const apiKey = process.env.NEXT_PUBLIC_BASE_API_KEY
 
   const headers: Record<string, string> = {
     ...Object.fromEntries(new Headers(options.headers || {})),
     'X-Platform-Application': getIsMobile() ? 'mobile-web' : 'desktop',
-    'Authorization': `Bearer ${userAuth}`,
-    'X-Api-Key': terasApiKey || '',
+    'Authorization': `Bearer ${userAuth || ''}`,
+    'X-Api-Key': apiKey || '',
   }
 
   const response = await fetch(url, {
