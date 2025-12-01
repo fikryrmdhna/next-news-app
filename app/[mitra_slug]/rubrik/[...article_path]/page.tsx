@@ -6,6 +6,7 @@ import AuthorInfo from "@/app/components/sections/AuthorInfo";
 import TagArticle from "@/app/components/sections/TagArticle";
 import Image from "next/image";
 import type { HomepageLatestArticle } from "@/types/homepage";
+import NewsSummary from "@/app/components/sections/NewsSummary";
 
 export const dynamic = 'force-dynamic';
 
@@ -50,6 +51,8 @@ export default async function ArticleDetailPage({
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || '';
   const articleUrl = `${baseUrl}${mitra_slug}/rubrik/${fullPath}`;
 
+  console.log(article)
+
   // Get authors from article_users
   const authors = article.article_users
     ?.filter((au) => au.type === 'writer')
@@ -59,9 +62,7 @@ export default async function ArticleDetailPage({
     <div className="container">
       <main>
         <Breadcrumb items={[
-          { label: article.partner?.name || mitra_slug, href: `/${mitra_slug}` },
           { label: article.sub_rubric?.name || 'Artikel' },
-          { label: article.title_digital }
         ]} />
 
         <div className="flex flex-col lg:flex-row gap-8">
@@ -72,16 +73,12 @@ export default async function ArticleDetailPage({
               <h1 className="text-3xl lg:text-4xl font-bold text-[#212121] mb-4">
                 {article.title_digital}
               </h1>
+              <p className="text-sm text-[#424242] word-break-legacy">
+                {article.description}
+              </p>
               
               {/* Meta Info */}
-              <div className="flex items-center gap-4 text-sm text-gray-600 mb-4">
-                <time dateTime={article.published_at}>
-                  {new Date(article.published_at).toLocaleDateString('id-ID', {
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric'
-                  })}
-                </time>
+              <div className="flex justify-between items-center text-sm text-gray-600 my-4">
                 {article.partner && (
                   <span className="flex items-center gap-2">
                     <Image
@@ -95,6 +92,9 @@ export default async function ArticleDetailPage({
                     {article.partner.name}
                   </span>
                 )}
+                <span className="text-xs lg:text-sm text-[#333]">
+                  {article.published_at_label}
+                </span>
               </div>
 
               {/* Author Info */}
@@ -106,8 +106,6 @@ export default async function ArticleDetailPage({
                 </div>
               )}
 
-              {/* Share Buttons */}
-              <ShareArticle url={articleUrl} title={article.title_digital} />
             </header>
 
             {/* Featured Image */}
@@ -129,6 +127,10 @@ export default async function ArticleDetailPage({
               </figure>
             )}
 
+            {article.summary && article.summary.length > 0 && (
+              <NewsSummary summary={article.summary} />
+            )}
+
             {/* Article Content */}
             <div 
               className="prose prose-lg max-w-none mb-8"
@@ -136,9 +138,12 @@ export default async function ArticleDetailPage({
             />
 
             {/* Tags */}
-            {article.tags && article.tags.length > 0 && (
-              <TagArticle tags={article.tags} />
+            {article.tag_article && article.tag_article.length > 0 && (
+              <TagArticle tags={article.tag_article} />
             )}
+            
+            {/* Share Buttons */}
+            <ShareArticle url={articleUrl} title={article.title_digital} />
 
             {/* Related Articles */}
             {relatedArticles.length > 0 && (
@@ -154,26 +159,26 @@ export default async function ArticleDetailPage({
                 </div>
               </section>
             )}
+
+            {/* Latest Articles */}
+            {latestArticles.length > 0 && (
+              <section className="mt-12">
+                <h2 className="text-2xl font-bold mb-6 text-[#212121]">Artikel Terbaru</h2>
+                <div className="space-y-6">
+                  {latestArticles.slice(0, 5).map((latestArticle) => (
+                    <ArticleCardTypeThree
+                      key={latestArticle.article_uuid}
+                      data={latestArticle as HomepageLatestArticle}
+                    />
+                  ))}
+                </div>
+              </section>
+            )}
           </article>
 
           {/* Sidebar */}
           <aside className="w-full lg:w-80">
-            <div className="sticky top-24">
-              {/* Latest Articles */}
-              {latestArticles.length > 0 && (
-                <section className="bg-white p-4 rounded-lg shadow mb-6">
-                  <h3 className="text-xl font-bold mb-4 text-[#212121]">Berita Terbaru</h3>
-                  <div className="space-y-4">
-                    {latestArticles.slice(0, 5).map((latestArticle) => (
-                      <ArticleCardTypeThree
-                        key={latestArticle.article_uuid}
-                        data={latestArticle as HomepageLatestArticle}
-                        hideImageOnDesktop
-                      />
-                    ))}
-                  </div>
-                </section>
-              )}
+            <div className="sticky top-35">
 
               {/* Viral Tags */}
               {viralTags.length > 0 && (

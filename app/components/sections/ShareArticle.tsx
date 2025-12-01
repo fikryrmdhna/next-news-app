@@ -23,7 +23,7 @@ export default function ShareArticle({ title, url }: ShareArticleProps) {
   };
 
   return (
-    <div className="bg-gray-50 p-4 rounded-lg">
+    <div className="bg-gray-50 rounded-lg">
       <h3 className="text-sm font-semibold text-gray-700 mb-3">Bagikan Artikel</h3>
       <div className="flex flex-wrap gap-2">
         <a
